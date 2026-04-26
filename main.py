@@ -55,7 +55,9 @@ while game:
         racket2.update_r()
         ball.rect.x += speed_x
         ball.rect.y += speed_y
-
+        if sprite.collide_rect(racket1, ball) or sprite.collide_rect(racket2, ball):
+            speed_x *= -1
+            
         racket1.reset()
         racket2.reset()
         ball.reset()
