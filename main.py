@@ -1,4 +1,5 @@
 from pygame import *
+from random import randint
 
 class GameSprite(sprite.Sprite):
     def __init__(self, player_image, player_x, player_y, player_speed, widht, height):
@@ -40,15 +41,23 @@ FPS = 60
 
 racket1 = Player('racket.png', 30, 200, 4, 50, 150)
 racket2 = Player('racket.png', 520, 200, 4, 50, 150)
-ball = GameSprite('tenis_ball.png', 200, 200, 4, 50, 50)
+ball = GameSprite('tenis_ball.png', randint(175, 225), randint(175, 225), 4, 50, 50)
 
 font.init()
 font = font.Font(None, 35)
 lose1 = font.render('PLAYER 1 LOSE!', True, (180,0,0))
 lose2 = font.render('PLAYER 2 LOSE!', True, (180,0,0))
 
-speed_x = 3
-speed_y = 3
+rand_speed = [-1,1]
+
+speed_x = 3 * rand_speed[randint(0,1)]
+speed_y = 3 * rand_speed[randint(0,1)]
+
+score1 = 0
+score2 = 0
+
+score = font.render(f'Счёт: {str(score1)}/{score2}', True, (0,0,0))
+
 
 while game:
     for e in event.get():
@@ -67,15 +76,31 @@ while game:
             speed_y *= -1
 # Условия проигрыша 
         if ball.rect.x < 0:
-            finish = True
-            window.blit(lose1, (200,200))
-            game_over = True
+            score2 += 1
+            score = font.render(f'Счёт: {str(score1)}/{score2}', True, (0,0,0))
+            ball.rect.x = randint(175, 255)
+            ball.rect.y = randint(175, 255)
+            speed_x *= rand_speed[randint(0,1)]
+            speed_y *= rand_speed[randint(0,1)]
         
         if ball.rect.x > win_width-50:
+            score1 += 1
+            score = font.render(f'Счёт: {str(score1)}/{score2}', True, (0,0,0))
+            ball.rect.x = randint(175, 255)
+            ball.rect.y = randint(175, 255)
+            speed_x *= rand_speed[randint(0,1)]
+            speed_y *= rand_speed[randint(0,1)]
+
+        if score1 > 5 or score2 > 5:
             finish = True
-            window.blit(lose2, (200,200))
-            game_over = True
-            
+            ball.rect.x = 400
+            ball.rect.y = 400
+            if score1 > score2:
+                window.blit(lose2, (200, 200))
+            else:
+                window.blit(lose1, (200, 200))
+        
+        window.blit(score, (250, 0))
         racket1.reset()
         racket2.reset()
         ball.reset()
