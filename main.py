@@ -1,5 +1,6 @@
 from pygame import *
 from random import randint
+from time import time as timer
 
 class GameSprite(sprite.Sprite):
     def __init__(self, player_image, player_x, player_y, player_speed, widht, height):
@@ -38,6 +39,7 @@ game = True
 finish = False
 clock = time.Clock()
 FPS = 60
+sec = 0
 
 racket1 = Player('racket.png', 30, 200, 4, 50, 150)
 racket2 = Player('racket.png', win_width-80, 200, 4, 50, 150)
@@ -47,6 +49,7 @@ font.init()
 font = font.Font(None, 35)
 lose1 = font.render('PLAYER 1 LOSE!', True, (180,0,0))
 lose2 = font.render('PLAYER 2 LOSE!', True, (180,0,0))
+
 
 rand_speed = [-1,1]
 
@@ -90,7 +93,6 @@ while game:
 # Условия проигрыша 
         if ball.rect.x < 0:
             score2 += 1
-            score = font.render(f'Счёт: {str(score1)}/{score2}', True, (255,255,255))
             ball.image = transform.scale(image.load(pic_list[randint(0, len(pic_list)-1)]), (50, 50))
             ball.rect.x = randint(175, 255)
             ball.rect.y = randint(175, 255)
@@ -99,7 +101,7 @@ while game:
         
         if ball.rect.x > win_width-50:
             score1 += 1
-            score = font.render(f'Счёт: {str(score1)}/{score2}', True, (255,255,255))
+            
             ball.image = transform.scale(image.load(pic_list[randint(0, len(pic_list)-1)]), (50, 50))
             ball.rect.x = randint(175, 255)
             ball.rect.y = randint(175, 255)
@@ -108,16 +110,35 @@ while game:
 
         if score1 > 4 or score2 > 4:
             finish = True
+            start = timer()
             ball.rect.x = 400
             ball.rect.y = 400
-            if score1 > score2:
-                window.blit(lose2, (200, 200))
-            else:
-                window.blit(lose1, (200, 200))
         
+        score = font.render(f'Счёт: {str(score1)}/{score2}', True, (255,255,255))
         window.blit(score, (win_width//2-50, 20))
         racket1.reset()
         racket2.reset()
         ball.reset()
+    else:
+        window.blit(background, (0,0))
+        if score1 > score2:
+            window.blit(lose2, (win_width//2-100, win_height//2-50))
+        else:
+            window.blit(lose1, (win_width//2-100, win_height//2-50))
+        curent = timer()
+        sec = 5 - int(curent-start)
+        game_start = font.render(f'Игра начнётся через {sec}', True, (180, 0, 0))
+        window.blit(game_start, (255,280))
+        if int(curent - start) >= 5:
+            score1 = 0
+            score2 = 0
+            flag = 0
+            ball.image = transform.scale(image.load(pic_list[randint(0, len(pic_list)-1)]), (50, 50))
+            ball.rect.x = randint(175, 255)
+            ball.rect.y = randint(175, 255)
+            speed_x *= rand_speed[randint(0,1)]
+            speed_y *= rand_speed[randint(0,1)]
+            finish = False
+
     display.update()
     clock.tick(FPS)
